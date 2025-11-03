@@ -1,3 +1,80 @@
+/* Tailwind base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* بدنه کلی */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-neutral-950 text-neutral-100 overflow-x-hidden;
+  }
+}
+
+/* گرین ملایم */
+.grain {
+  background-image: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>\
+    <filter id='f'>\
+      <feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/>\
+      <feColorMatrix type='saturate' values='0'/>\
+      <feComponentTransfer><feFuncA type='table' tableValues='0 0 0 0 0.08 0'/></feComponentTransfer>\
+    </filter>\
+    <rect width='100%' height='100%' filter='url(%23f)'/>\
+  </svg>");
+  background-size: 160px 160px;
+  mix-blend-mode: soft-light;
+}
+
+/* وینیت سینمایی */
+.vignette::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 240px rgba(0, 0, 0, 0.55);
+  z-index: 5;
+}
+
+/* شبکه صنعتی نرم */
+.bg-grid {
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* انیمیشن‌های blob */
+@keyframes blobFloat {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -14px) scale(1.05);
+  }
+}
+@keyframes blobFloat2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-18px, 16px) scale(1.06);
+  }
+}
+.animate-blob {
+  animation: blobFloat 9s ease-in-out infinite;
+}
+.animate-blob2 {
+  animation: blobFloat2 11s ease-in-out infinite;
+}
+
+/* گرد و خاک */
 @keyframes dust {
   0% {
     transform: translateX(0) translateY(0) scale(1);
@@ -8,30 +85,21 @@
     opacity: 0;
   }
 }
-
 .dust {
   animation: dust 2s ease-out infinite;
 }
 
+/* ورود نرم جاده */
 @keyframes roadFadeIn {
-  0% {
+  from {
     opacity: 0;
     transform: translateY(15px);
   }
-  100% {
+  to {
     opacity: 0.18;
     transform: translateY(0);
   }
 }
 .animate-roadFadeIn {
-  animation: roadFadeIn 1.6s ease-out forwards;
-}
-
-.bg-grid {
-  background-image: linear-gradient(
-      rgba(255, 255, 255, 0.05) 1px,
-      transparent 1px
-    ),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 50px 50px;
+  animation: roadFadeIn 1.4s ease-out forwards;
 }
