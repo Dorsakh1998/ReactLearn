@@ -1,42 +1,64 @@
-#root {
-  max-width: 1280px;
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #0f0f0f;
+  direction: rtl;
+  padding-bottom: 60px;
+}
+
+.app-main-content {
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 40px;
+  direction: rtl;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-cart-section {
+  order: 1;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+.app-product-section {
+  order: 2;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .app-main-content {
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    padding: 30px;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@media (max-width: 1200px) {
+  .app-main-content {
+    grid-template-columns: 320px 1fr;
+    gap: 25px;
+    padding: 25px;
   }
 }
 
-.card {
-  padding: 2em;
+@media (max-width: 992px) {
+  .app-main-content {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 20px;
+  }
+
+  .app-cart-section {
+    order: 2;
+  }
+
+  .app-product-section {
+    order: 1;
+  }
 }
 
-.read-the-docs {
-  color: #888;
+@media (max-width: 768px) {
+  .app-main-content {
+    padding: 15px;
+  }
 }

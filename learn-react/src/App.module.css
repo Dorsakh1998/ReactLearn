@@ -1,0 +1,53 @@
+/* استایل‌های اصلی */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  font-family: Tahoma, Arial, sans-serif;
+  direction: rtl;
+}
+
+.mainContent {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-direction: row-reverse;
+}
+
+.cartSection {
+  flex: 1 1 350px;
+  min-width: 300px;
+  max-width: 450px;
+}
+
+.productSection {
+  flex: 2 1 600px;
+  min-width: 0;
+}
+
+/* Responsive - تبلت */
+@media (max-width: 1024px) {
+  .mainContent {
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .cartSection {
+    max-width: 400px;
+  }
+}
+
+/* Responsive - موبایل */
+@media (max-width: 768px) {
+  .mainContent {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .cartSection,
+  .productSection {
+    max-width: 100%;
+    min-width: 100%;
+  }
+}
