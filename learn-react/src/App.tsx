@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Header from "./components/Header";
 import ProductList from "./components/ProductList";
 import Cart from "./components/Cart";
@@ -8,6 +8,31 @@ import "./App.css";
 const App = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [scrollY, setScrollY] = useState(0);
+  const [elapsedSec, setElapsedSec] = useState(0);
+
+  const heroRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
+
+  // 📜 اسکرول
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 🎞️ حلقه انیمیشن اصلی
+  useEffect(() => {
+    const loop = (t: number) => {
+      if (startRef.current == null) startRef.current = t;
+      const dt = (t - startRef.current) / 1000;
+      setElapsedSec(dt);
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+    return () => rafRef.current && cancelAnimationFrame(rafRef.current);
+  }, []);
 
   const products: Product[] = [
     {
@@ -66,109 +91,200 @@ const App = () => {
     return true;
   });
 
-  const handleAddToCart = (product: Product) => {
-    const existingItem = cartItems.find((item) => item.id === product.id);
-
-    if (existingItem) {
-      if (existingItem.quantity < product.stock) {
+  // 🧮 سبد خرید
+  const handleAddToCart = (p: Product) => {
+    const exist = cartItems.find((i) => i.id === p.id);
+    if (exist) {
+      if (exist.quantity < p.stock)
         setCartItems(
-          cartItems.map((item) =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
+          cartItems.map((i) =>
+            i.id === p.id ? { ...i, quantity: i.quantity + 1 } : i
           )
         );
-      } else {
-        alert("⚠️ موجودی کافی نیست!");
-      }
-    } else {
-      setCartItems([...cartItems, { ...product, quantity: 1 }]);
-    }
+      else alert("⚠️ موجودی کافی نیست!");
+    } else setCartItems([...cartItems, { ...p, quantity: 1 }]);
   };
-
-  const handleRemoveFromCart = (productId: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== productId));
-  };
-
-  const handleClearCart = () => {
-    if (window.confirm("آیا مطمئن هستید که می‌خواهید سبد خرید را خالی کنید؟")) {
-      setCartItems([]);
-    }
-  };
-
-  const handleUpdateQuantity = (productId: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-
-    const product = products.find((p) => p.id === productId);
-    if (!product) return;
-
-    if (newQuantity > product.stock) {
-      alert("⚠️ موجودی کافی نیست!");
-      return;
-    }
-
+  const handleRemoveFromCart = (id: number) =>
+    setCartItems(cartItems.filter((i) => i.id !== id));
+  const handleClearCart = () =>
+    window.confirm("آیا مطمئن هستید؟") && setCartItems([]);
+  const handleUpdateQuantity = (id: number, q: number) => {
+    if (q < 1) return;
+    const p = products.find((x) => x.id === id);
+    if (!p || q > p.stock) return alert("⚠️ موجودی کافی نیست!");
     setCartItems(
-      cartItems.map((item) =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
-      )
+      cartItems.map((i) => (i.id === id ? { ...i, quantity: q } : i))
     );
   };
+  const scrollToProducts = () =>
+    document
+      .getElementById("products-section")
+      ?.scrollIntoView({ behavior: "smooth" });
+
+  // ⚙️ پارامترهای فیزیکی
+  const BASE_SPIN_DEG_PER_SEC = 180;
+  const BASE_ROAD_PX_PER_SEC = 120;
+  const wheelRotationDeg = scrollY * 1.05 + elapsedSec * BASE_SPIN_DEG_PER_SEC;
+  const wheelSwayX = Math.sin(scrollY * 0.01) * 14;
+  const wheelBobY = Math.sin(elapsedSec * 2.4) * 3;
+  const roadMovePx = elapsedSec * BASE_ROAD_PX_PER_SEC + scrollY * 2;
 
   return (
     <div className="min-h-screen">
-      <Header shopName="اتو پارت پرو" cartCount={cartItems.length} />
+      <Header
+        shopName="اتو پارت پرو"
+        cartCount={cartItems.reduce((s, i) => s + i.quantity, 0)}
+      />
 
-      <div className="max-w-[1800px] mx-auto px-6 pt-8">
-        {/* دسته‌بندی */}
-        <div
-          className="glass-strong rounded-2xl p-2 mb-8
-                        shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-        >
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-military-600 pb-2">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2.5 px-6 py-3 rounded-xl
-                           font-bold text-sm whitespace-nowrap
-                           transition-all duration-300 shrink-0
-                           ${
-                             selectedCategory === category.id
-                               ? "bg-gradient-to-r from-military-600 to-military-700 text-white shadow-[0_4px_16px_rgba(107,133,85,0.5)] scale-105"
-                               : "glass text-zinc-400 hover:text-white hover:bg-dark-700"
-                           }`}
-              >
-                <span className="text-lg">{category.icon}</span>
-                <span>{category.name}</span>
-                {selectedCategory === category.id &&
-                  filteredProducts.length > 0 && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-bold font-en">
+      {/* 🟢 HERO */}
+      <section
+        ref={heroRef}
+        className="relative min-h-[92vh] flex items-center justify-center overflow-hidden"
+      >
+        {/* پس‌زمینه نور و خطوط */}
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(900px 500px at 75% 20%, rgba(163,230,53,0.14), transparent 65%), radial-gradient(800px 500px at 20% 75%, rgba(253,224,71,0.10), transparent 60%)",
+            }}
+          />
+          <div className="absolute inset-0 opacity-[0.05] bg-grid" />
+        </div>
+
+        <div className="relative z-10 w-full max-w-6xl px-6 py-20">
+          {/* 🛞 چرخ + جاده */}
+          <div className="flex flex-col items-center justify-center mt-8 mb-8 relative">
+            {/* جاده پشت چرخ */}
+            <div
+              className="absolute bottom-0 w-[860px] max-w-full h-12 rounded-full overflow-hidden animate-roadFadeIn"
+              style={{
+                background:
+                  "repeating-linear-gradient(90deg, rgba(255,255,255,0.8) 0 40px, transparent 40px 80px)",
+                backgroundPositionX: `-${roadMovePx}px`,
+                opacity: 0.18,
+                filter: "drop-shadow(0 0 8px rgba(255,255,255,0.3))",
+              }}
+            ></div>
+
+            {/* سایه زیر چرخ */}
+            <div className="w-[280px] h-10 bg-black/25 blur-2xl rounded-full mb-2 relative z-10" />
+
+            {/* چرخ */}
+            <div
+              className="relative z-20"
+              style={{
+                transform: `translateX(${wheelSwayX}px) translateY(${wheelBobY}px)`,
+                willChange: "transform",
+              }}
+            >
+              <div className="relative w-52 h-52 md:w-56 md:h-56">
+                <div className="absolute inset-0 rounded-full bg-neutral-900 border-[10px] border-neutral-800" />
+                <div
+                  className="absolute inset-[2px] rounded-full opacity-25"
+                  style={{
+                    backgroundImage:
+                      "repeating-conic-gradient(from 0deg, rgba(255,255,255,0.15) 0 6deg, transparent 6deg 12deg)",
+                  }}
+                />
+                <div
+                  className="absolute inset-[14px] rounded-full bg-neutral-100/10 border-4 border-neutral-300/30 grid place-items-center"
+                  style={{
+                    transform: `rotate(${wheelRotationDeg}deg)`,
+                    filter: "drop-shadow(0 0 6px rgba(255,255,255,0.08))",
+                  }}
+                >
+                  <div className="w-28 h-1 bg-neutral-200 absolute" />
+                  <div className="w-28 h-1 bg-neutral-200 absolute rotate-60" />
+                  <div className="w-28 h-1 bg-neutral-200 absolute -rotate-60" />
+                  <div className="w-6 h-6 rounded-full bg-neutral-100 shadow-inner" />
+                </div>
+                <div className="absolute inset-0 rounded-full blur-2xl bg-lime-300/16" />
+              </div>
+
+              {/* رد سرعت */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-[70%] -translate-y-1/2 w-44 h-2 bg-lime-300/35 blur-md rounded-full" />
+
+              {/* گرد و خاک */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-[80%] flex gap-2 pointer-events-none">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-amber-200/50 dust"
+                    style={{ animationDelay: `${i * 0.18}s` }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* عنوان و دکمه */}
+          <div className="text-center">
+            <h1 className="text-5xl md:text-6xl font-semibold text-white mb-4 tracking-tight">
+              قطعات یدکی با <span className="text-emerald-400">کیفیت برتر</span>
+            </h1>
+            <p className="text-base md:text-lg text-zinc-100/90 mb-10 max-w-2xl mx-auto">
+              خرید مطمئن روغن، فیلتر و قطعات مصرفی با تضمین اصالت و ارسال سریع.
+            </p>
+            <button
+              onClick={scrollToProducts}
+              className="px-8 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow-[0_8px_30px_rgba(16,185,129,0.35)] transition"
+            >
+              مشاهده محصولات
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 🛠️ محصولات */}
+      <section id="products-section" className="relative py-20">
+        <div className="max-w-[1800px] mx-auto px-6">
+          <div className="glass-strong rounded-2xl p-2 mb-8">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedCategory(c.id)}
+                  className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm transition ${
+                    selectedCategory === c.id
+                      ? "bg-emerald-600 text-white shadow-[0_8px_28px_rgba(16,185,129,0.35)]"
+                      : "glass text-zinc-300 hover:text-white"
+                  }`}
+                >
+                  <span className="text-lg">{c.icon}</span>
+                  <span>{c.name}</span>
+                  {selectedCategory === c.id && filteredProducts.length > 0 && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-medium font-en">
                       {filteredProducts.length}
                     </span>
                   )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 pb-12">
-          <div>
-            <ProductList
-              products={filteredProducts}
-              onAddToCart={handleAddToCart}
-            />
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div>
-            <Cart
-              cartItems={cartItems}
-              onRemoveFromCart={handleRemoveFromCart}
-              onClearCart={handleClearCart}
-              onUpdateQuantity={handleUpdateQuantity}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 pb-12 items-start">
+            <div>
+              <ProductList
+                products={filteredProducts}
+                onAddToCart={handleAddToCart}
+              />
+            </div>
+            <div
+              className="sticky top-36"
+              style={{ maxHeight: "calc(100vh - 160px)", overflowY: "auto" }}
+            >
+              <Cart
+                cartItems={cartItems}
+                onRemoveFromCart={handleRemoveFromCart}
+                onClearCart={handleClearCart}
+                onUpdateQuantity={handleUpdateQuantity}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

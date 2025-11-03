@@ -1,107 +1,181 @@
 import { HeaderProps } from "../types/types";
+import { useState, useEffect } from "react";
 
 const Header: React.FC<HeaderProps> = ({ shopName, cartCount }) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <header
-      className="sticky top-0 z-[1000] w-full
-                       glass-strong
-                       border-b border-white/5
-                       shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+      className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-500
+                        ${scrolled ? "py-3" : "py-5"}`}
     >
-      {/* Pattern پس‌زمینه */}
-      <div
-        className="absolute inset-0 opacity-5 pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      ></div>
+      <div className="max-w-[1800px] mx-auto px-6">
+        <div
+          className={`relative glass-strong rounded-3xl 
+                         border border-white/5
+                         transition-all duration-500
+                         ${
+                           scrolled
+                             ? "shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
+                             : "shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+                         }`}
+        >
+          {/* Pattern خطوط جاده */}
+          <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none opacity-[0.03]">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `repeating-linear-gradient(
+                     90deg,
+                     transparent,
+                     transparent 40px,
+                     rgba(255,255,255,0.5) 40px,
+                     rgba(255,255,255,0.5) 45px
+                   )`,
+              }}
+            ></div>
+          </div>
 
-      {/* نور محیطی */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px]
-                      bg-military-600/5 rounded-full blur-[100px] pointer-events-none"
-      ></div>
+          {/* نور محیطی متحرک */}
+          <div
+            className="absolute -top-10 left-1/4 w-64 h-64 
+                          bg-military-600/10 rounded-full blur-[80px] 
+                          animate-pulse pointer-events-none"
+          ></div>
 
-      <div className="relative max-w-[1800px] mx-auto px-6 md:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* لوگو و برند */}
-          <div className="flex items-center gap-4">
-            {/* لوگو */}
-            <div className="relative w-12 h-12">
-              <div
-                className="absolute inset-0 bg-gradient-to-br from-military-500 to-military-700 
-                              rounded-2xl blur-md opacity-50"
-              ></div>
-              <div
-                className="relative w-full h-full glass rounded-2xl
-                              flex items-center justify-center
-                              border border-military-500/30
-                              shadow-[0_4px_16px_rgba(107,133,85,0.3)]"
-              >
-                <svg
-                  className="w-6 h-6 text-military-300"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
+          <div className="relative px-6 md:px-8 py-4 flex items-center justify-between gap-6">
+            {/* بخش راست: لوگو و برند */}
+            <div className="flex items-center gap-4">
+              {/* لوگو متحرک */}
+              <div className="relative group cursor-pointer">
+                {/* چرخ دنده */}
+                <div className="relative w-14 h-14">
+                  {/* سایه */}
+                  <div
+                    className="absolute inset-0 bg-military-600/20 rounded-full blur-xl 
+                                  group-hover:bg-military-500/30 transition-all duration-500"
+                  ></div>
+
+                  {/* چرخ دنده اصلی */}
+                  <div
+                    className="relative w-full h-full rounded-full
+                                  bg-gradient-to-br from-dark-700 to-dark-800
+                                  border-2 border-military-600/30
+                                  flex items-center justify-center
+                                  group-hover:rotate-90 transition-all duration-700
+                                  shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)]"
+                  >
+                    {/* دندانه‌های چرخ دنده */}
+                    <svg
+                      className="w-10 h-10 text-military-500/80 group-hover:text-military-400
+                                    transition-colors duration-500"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+                    </svg>
+
+                    {/* نقطه مرکزی */}
+                    <div
+                      className="absolute w-3 h-3 bg-military-600 rounded-full
+                                    shadow-[0_0_10px_rgba(107,133,85,0.6)]"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* نام برند */}
+              <div className="text-right">
+                <h1
+                  className="text-xl md:text-2xl font-light text-white tracking-wide
+                               relative inline-block group/text cursor-pointer"
                 >
-                  <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" />
-                </svg>
+                  <span className="relative z-10">{shopName}</span>
+
+                  {/* خط زیر متحرک */}
+                  <span
+                    className="absolute bottom-0 right-0 w-0 h-[2px] 
+                                   bg-gradient-to-l from-military-500 to-transparent
+                                   group-hover/text:w-full transition-all duration-500"
+                  ></span>
+                </h1>
+                <p className="text-[10px] text-zinc-500 font-light tracking-[0.2em] uppercase mt-1">
+                  Auto Parts & Accessories
+                </p>
               </div>
             </div>
 
-            {/* عنوان */}
-            <div className="text-right">
-              <h1
-                className="text-2xl md:text-3xl font-black text-white tracking-tight
-                             bg-gradient-to-l from-white via-white to-military-200 bg-clip-text text-transparent"
-              >
-                {shopName}
-              </h1>
-              <p className="text-[11px] text-zinc-500 font-medium tracking-wider uppercase mt-0.5">
-                Premium Auto Parts
-              </p>
-            </div>
-          </div>
+            {/* بخش مرکز: منوی ناوبری */}
+            <nav className="hidden lg:flex items-center gap-1">
+              {["محصولات", "برندها", "خدمات", "تماس"].map((item, index) => (
+                <a
+                  key={index}
+                  href="#"
+                  className="relative px-5 py-2 text-sm font-light text-zinc-400 
+                              hover:text-white transition-colors duration-300
+                              group/link"
+                >
+                  <span className="relative z-10">{item}</span>
 
-          {/* Navigation و سبد خرید */}
-          <div className="flex items-center gap-6">
-            {/* منوی ناوبری - اختیاری */}
-            <nav className="hidden md:flex items-center gap-1">
-              <a
-                href="#"
-                className="px-4 py-2 text-sm font-semibold text-zinc-400 
-                                     hover:text-white transition-colors duration-200"
-              >
-                محصولات
-              </a>
-              <a
-                href="#"
-                className="px-4 py-2 text-sm font-semibold text-zinc-400 
-                                     hover:text-white transition-colors duration-200"
-              >
-                درباره ما
-              </a>
-              <a
-                href="#"
-                className="px-4 py-2 text-sm font-semibold text-zinc-400 
-                                     hover:text-white transition-colors duration-200"
-              >
-                تماس
-              </a>
+                  {/* دایره پس‌زمینه */}
+                  <span
+                    className="absolute inset-0 rounded-xl
+                                   bg-military-600/0 group-hover/link:bg-military-600/10
+                                   scale-0 group-hover/link:scale-100
+                                   transition-all duration-300"
+                  ></span>
+                </a>
+              ))}
             </nav>
 
-            {/* سبد خرید */}
-            <div className="relative group cursor-pointer">
-              <div
-                className="flex items-center gap-3 px-5 py-2.5 rounded-xl
-                              glass
-                              hover:bg-military-600/10
-                              border border-white/5 hover:border-military-500/30
-                              transition-all duration-300"
+            {/* بخش چپ: سبد خرید */}
+            <div className="flex items-center gap-4">
+              {/* دکمه سرچ */}
+              <button
+                className="hidden md:flex items-center justify-center
+                                 w-10 h-10 rounded-xl
+                                 glass border border-white/5
+                                 text-zinc-400 hover:text-white
+                                 hover:border-military-500/30
+                                 transition-all duration-300
+                                 group/search"
               >
+                <svg
+                  className="w-5 h-5 group-hover/search:scale-110 transition-transform duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+
+              {/* سبد خرید */}
+              <button
+                className="relative flex items-center gap-3 px-4 py-2.5 rounded-xl
+                                 glass border border-white/5
+                                 hover:border-military-500/30
+                                 transition-all duration-300
+                                 group/cart"
+              >
+                {/* آیکون سبد */}
                 <div className="relative">
                   <svg
-                    className="w-6 h-6 text-zinc-300 group-hover:text-military-300 
-                                  transition-colors duration-300"
+                    className="w-6 h-6 text-zinc-300 group-hover/cart:text-military-300
+                                  group-hover/cart:scale-110 transition-all duration-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -114,30 +188,53 @@ const Header: React.FC<HeaderProps> = ({ shopName, cartCount }) => {
                     />
                   </svg>
 
+                  {/* Badge تعداد */}
                   {cartCount > 0 && (
                     <div
-                      className="absolute -top-2 -right-2 min-w-[20px] h-5 px-1.5
-                                    bg-gradient-to-r from-military-600 to-military-700
+                      className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1
+                                    bg-gradient-to-br from-military-500 to-military-700
                                     rounded-full
                                     flex items-center justify-center
                                     border border-dark-850
-                                    shadow-[0_2px_8px_rgba(107,133,85,0.5)]
-                                    animate-pulse"
+                                    shadow-[0_2px_8px_rgba(107,133,85,0.6)]
+                                    group-hover/cart:scale-110 transition-transform duration-300"
                     >
-                      <span className="text-white text-[10px] font-bold font-en">
+                      <span className="text-white text-[9px] font-medium font-en">
                         {cartCount > 9 ? "9+" : cartCount}
                       </span>
                     </div>
                   )}
                 </div>
 
+                {/* متن */}
                 <div className="hidden sm:block text-right">
-                  <div className="text-white text-sm font-bold">سبد خرید</div>
-                  <div className="text-zinc-500 text-[10px] font-medium font-en">
-                    {cartCount} {cartCount === 1 ? "Item" : "Items"}
+                  <div className="text-white text-xs font-light">سبد خرید</div>
+                  <div className="text-zinc-500 text-[9px] font-light font-en">
+                    {cartCount} {cartCount === 1 ? "item" : "items"}
                   </div>
                 </div>
-              </div>
+
+                {/* خط عمودی */}
+                <div className="hidden sm:block w-px h-8 bg-white/5"></div>
+
+                {/* فلش */}
+                <svg
+                  className="hidden sm:block w-4 h-4 text-zinc-500 
+                                group-hover/cart:text-military-400 
+                                group-hover/cart:translate-x-0.5
+                                transition-all duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         </div>

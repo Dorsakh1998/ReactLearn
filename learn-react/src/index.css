@@ -2,68 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
-
 @layer base {
+  html {
+    @apply scroll-smooth;
+  }
   body {
-    @apply m-0 text-white min-h-screen;
-    background: linear-gradient(135deg, #0a0e14 0%, #12161f 50%, #1a1f2e 100%);
-    background-attachment: fixed;
-    font-family: "Estedad FD", Tahoma, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .font-en {
-    font-family: "Inter", system-ui, sans-serif;
+    @apply bg-neutral-950 text-neutral-100;
   }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  @apply w-2 h-2;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply rounded-full;
-  background: rgba(107, 133, 85, 0.3);
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 133, 85, 0.5);
-}
-
-::selection {
-  @apply bg-military-600/30 text-white;
-}
-
-/* Glass Effects */
-@layer utilities {
+/* سطوح شیشه‌ای */
+@layer components {
   .glass {
-    background: rgba(26, 31, 46, 0.6);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    @apply bg-white/5 backdrop-blur border border-white/10;
   }
-
-  .glass-hover {
-    background: rgba(31, 37, 51, 0.7);
-  }
-
   .glass-strong {
-    background: rgba(18, 22, 31, 0.8);
-    backdrop-filter: blur(30px) saturate(200%);
-    -webkit-backdrop-filter: blur(30px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    @apply bg-white/10 backdrop-blur-md border border-white/10;
   }
+  .glass-hover {
+    @apply bg-white/[0.06] backdrop-blur border border-white/10;
+  }
+}
 
-  .scrollbar-thin::-webkit-scrollbar {
-    @apply w-1.5;
-  }
+/* بک‌گراند گرید نرمِ هیرو */
+.bg-grid {
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* شـیـمـر دکمه */
+.shimmer-line {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.shimmer-line::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 35%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.14),
+    transparent
+  );
+  transform: translateX(-120%);
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* اسکرول‌بار ظریف (اختیاری) */
+*::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(110, 164, 67, 0.45);
+  border-radius: 8px;
 }
